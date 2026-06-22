@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Shotmaker — AI-assisted video shoot planner",
+  title: "Shotmaker — shoot-day shot tracker",
   description:
-    "Plan video shoots as storyboards: organize sessions and shot lists, generate shot descriptions with AI, and reorder everything with drag-and-drop.",
+    "A shot tracker for production crews: set the shooting order, mark shots filmed or abandoned, and track essential vs optional shots so you know when the session can wrap.",
 };
 
 export default function RootLayout({

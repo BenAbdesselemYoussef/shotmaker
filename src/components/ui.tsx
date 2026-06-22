@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes } from "react";
 
-import { movementMeta, shotTypeMeta, statusMeta } from "@/lib/meta";
-import type { Movement, ShotStatus, ShotType } from "@/lib/types";
+import { movementMeta, priorityMeta, shotTypeMeta, statusMeta } from "@/lib/meta";
+import type { Movement, Priority, ShotStatus, ShotType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -51,15 +51,61 @@ export function MovementChip({ movement }: { movement: Movement }) {
   );
 }
 
-export function StatusPill({ status }: { status: ShotStatus }) {
-  const meta = statusMeta[status];
+export function PriorityBadge({ priority }: { priority: Priority }) {
+  const meta = priorityMeta[priority];
+  const Icon = meta.icon;
+  const essential = priority === "essential";
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-xs font-medium"
-      style={{ background: `color-mix(in oklab, ${meta.color} 15%, transparent)`, color: meta.color }}
+      className={cn(
+        "inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[0.68rem] font-medium",
+        essential ? "" : "border-border text-muted-2 border border-dashed",
+      )}
+      style={essential ? { background: `color-mix(in oklab, ${meta.color} 16%, transparent)`, color: meta.color } : undefined}
     >
-      <span className="size-1.5 rounded-full" style={{ background: meta.color }} />
+      <Icon className="size-3" />
       {meta.name}
     </span>
+  );
+}
+
+// Clickable status pill — cycles to_film -> filmed -> abandoned on the crew's tap.
+export function StatusToggle({
+  status,
+  onClick,
+}: {
+  status: ShotStatus;
+  onClick?: () => void;
+}) {
+  const meta = statusMeta[status];
+  const Icon = meta.icon;
+  const content = (
+    <>
+      <Icon className="size-3.5" style={{ color: meta.color }} />
+      <span style={{ color: meta.color }}>{meta.name}</span>
+    </>
+  );
+  const cls =
+    "inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium transition-colors";
+  const bg = { background: `color-mix(in oklab, ${meta.color} 14%, transparent)` };
+  if (!onClick)
+    return (
+      <span className={cls} style={bg}>
+        {content}
+      </span>
+    );
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+      title="Click to update status"
+      className={cn(cls, "hover:brightness-125 cursor-pointer")}
+      style={bg}
+    >
+      {content}
+    </button>
   );
 }

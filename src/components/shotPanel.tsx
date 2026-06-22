@@ -4,12 +4,10 @@ import { Lightbulb, Plus, Sparkles, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { ShotThumb } from "@/components/shotThumb";
-import { MovementChip, ShotTypeChip, StatusPill } from "@/components/ui";
+import { MovementChip, PriorityBadge, ShotTypeChip, StatusToggle } from "@/components/ui";
 import { describeFromTitle, factSuggestions } from "@/lib/ai";
-import { formatDuration, shotTypeMeta } from "@/lib/meta";
-import type { Session, Shot, ShotStatus } from "@/lib/types";
-
-const statusOrder: ShotStatus[] = ["planned", "shot", "edited"];
+import { formatDuration, statusCycle } from "@/lib/meta";
+import type { Session, Shot } from "@/lib/types";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -61,8 +59,12 @@ export function ShotPanel({
   }
 
   function cycleStatus() {
-    const next = statusOrder[(statusOrder.indexOf(shot.status) + 1) % statusOrder.length];
+    const next = statusCycle[(statusCycle.indexOf(shot.status) + 1) % statusCycle.length];
     onChange({ ...shot, status: next });
+  }
+
+  function togglePriority() {
+    onChange({ ...shot, priority: shot.priority === "essential" ? "optional" : "essential" });
   }
 
   return (
@@ -86,12 +88,27 @@ export function ShotPanel({
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
-          <ShotThumb index={index} hue={session.hue} type={shot.type} durationSec={shot.durationSec} className="aspect-video w-full rounded-xl" />
+          <ShotThumb
+            index={index}
+            hue={session.hue}
+            type={shot.type}
+            durationSec={shot.durationSec}
+            status={shot.status}
+            className="aspect-video w-full rounded-xl"
+          />
 
           <h2 className="text-foreground mt-4 text-lg font-semibold">{shot.title}</h2>
 
+          {/* Status + priority — the two things the crew sets on the day */}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <StatusToggle status={shot.status} onClick={cycleStatus} />
+            <button type="button" onClick={togglePriority} className="cursor-pointer" title="Toggle priority">
+              <PriorityBadge priority={shot.priority} />
+            </button>
+          </div>
+
           {/* Description + AI */}
-          <div className="mt-3">
+          <div className="mt-4">
             <div className="mb-1.5 flex items-center justify-between">
               <span className="text-muted text-xs">Description</span>
               <button
@@ -125,11 +142,6 @@ export function ShotPanel({
             </Field>
             <Field label="Location">
               <span className="text-foreground text-sm">{shot.location}</span>
-            </Field>
-            <Field label="Status">
-              <button type="button" onClick={cycleStatus} className="cursor-pointer" title="Click to advance">
-                <StatusPill status={shot.status} />
-              </button>
             </Field>
           </div>
 

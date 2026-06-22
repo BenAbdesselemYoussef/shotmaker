@@ -1,6 +1,13 @@
 export type ShotType = "wide" | "medium" | "close-up" | "pov" | "drone" | "macro";
 export type Movement = "static" | "pan" | "tilt" | "dolly" | "handheld" | "crane";
-export type ShotStatus = "planned" | "shot" | "edited";
+
+// What the crew tracks on set.
+export type ShotStatus = "to_film" | "filmed" | "abandoned";
+
+// Whether the session needs this shot. Optional shots can be skipped and the
+// session still wraps successfully.
+export type Priority = "essential" | "optional";
+
 export type ViewMode = "storyboard" | "list";
 
 export type Shot = {
@@ -12,6 +19,7 @@ export type Shot = {
   durationSec: number;
   location: string;
   lens: string;
+  priority: Priority;
   status: ShotStatus;
 };
 
@@ -19,8 +27,8 @@ export type Session = {
   id: string;
   title: string;
   description: string;
-  date: string; // e.g. "Jun 24, 2026"
+  date: string;
   location: string;
-  hue: number; // base hue for the storyboard thumbnails
-  shots: Shot[];
+  hue: number;
+  shots: Shot[]; // array order = shooting order (drag to reorder)
 };

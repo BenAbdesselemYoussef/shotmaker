@@ -15,22 +15,52 @@ import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
 
 import { ShotThumb } from "@/components/shotThumb";
-import { MovementChip, ShotTypeChip, StatusPill } from "@/components/ui";
+import { PriorityBadge, ShotTypeChip, StatusToggle } from "@/components/ui";
 import type { Session, Shot } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-function CardInner({ shot, index, hue }: { shot: Shot; index: number; hue: number }) {
+function CardInner({
+  shot,
+  index,
+  hue,
+  onCycleStatus,
+}: {
+  shot: Shot;
+  index: number;
+  hue: number;
+  onCycleStatus?: () => void;
+}) {
+  const dim = shot.status !== "to_film";
   return (
-    <div className="border-border bg-surface-2 overflow-hidden rounded-xl border">
-      <ShotThumb index={index} hue={hue} type={shot.type} durationSec={shot.durationSec} className="aspect-video w-full" />
+    <div
+      className={cn(
+        "border-border bg-surface-2 overflow-hidden rounded-xl border transition-opacity",
+        dim && "opacity-65",
+      )}
+    >
+      <ShotThumb
+        index={index}
+        hue={hue}
+        type={shot.type}
+        durationSec={shot.durationSec}
+        status={shot.status}
+        className="aspect-video w-full"
+      />
       <div className="p-3">
-        <p className="text-foreground line-clamp-2 text-sm leading-snug">{shot.title}</p>
+        <p
+          className={cn(
+            "line-clamp-2 text-sm leading-snug",
+            shot.status === "abandoned" ? "text-muted-2 line-through" : "text-foreground",
+          )}
+        >
+          {shot.title}
+        </p>
         <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+          <PriorityBadge priority={shot.priority} />
           <ShotTypeChip type={shot.type} />
-          <MovementChip movement={shot.movement} />
         </div>
         <div className="mt-2">
-          <StatusPill status={shot.status} />
+          <StatusToggle status={shot.status} onClick={onCycleStatus} />
         </div>
       </div>
     </div>
@@ -42,11 +72,13 @@ function SortableCard({
   index,
   hue,
   onOpen,
+  onCycleStatus,
 }: {
   shot: Shot;
   index: number;
   hue: number;
   onOpen: () => void;
+  onCycleStatus: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: shot.id,
@@ -60,7 +92,7 @@ function SortableCard({
       {...attributes}
       {...listeners}
     >
-      <CardInner shot={shot} index={index} hue={hue} />
+      <CardInner shot={shot} index={index} hue={hue} onCycleStatus={onCycleStatus} />
     </div>
   );
 }
@@ -70,11 +102,13 @@ export function Storyboard({
   shots,
   onReorder,
   onOpen,
+  onCycleStatus,
 }: {
   session: Session;
   shots: Shot[];
   onReorder: (shots: Shot[]) => void;
   onOpen: (id: string) => void;
+  onCycleStatus: (id: string) => void;
 }) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
@@ -99,7 +133,14 @@ export function Storyboard({
       <SortableContext items={shots.map((s) => s.id)} strategy={rectSortingStrategy}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {shots.map((shot, i) => (
-            <SortableCard key={shot.id} shot={shot} index={i} hue={session.hue} onOpen={() => onOpen(shot.id)} />
+            <SortableCard
+              key={shot.id}
+              shot={shot}
+              index={i}
+              hue={session.hue}
+              onOpen={() => onOpen(shot.id)}
+              onCycleStatus={() => onCycleStatus(shot.id)}
+            />
           ))}
         </div>
       </SortableContext>

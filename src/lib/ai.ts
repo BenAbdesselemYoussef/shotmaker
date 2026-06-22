@@ -1,9 +1,9 @@
 import { shotTypeMeta } from "@/lib/meta";
-import type { Session, Shot, ShotType } from "@/lib/types";
+import type { ShotType } from "@/lib/types";
 
-// Stand-in for the Genkit flows in the original (generate-shot-description,
-// generate-description-from-title, ai-fact-assistant). Deterministic, canned,
-// but content-aware enough to feel real in the demo.
+// Light stand-in for the original's Genkit flows (generate-shot-description,
+// ai-fact-assistant). Deterministic, canned, content-aware. Secondary to the
+// core production-tracking workflow.
 
 const movementPhrases = [
   "Let the camera breathe with a slow, deliberate move.",
@@ -30,26 +30,6 @@ export function describeFromTitle(title: string, type: ShotType): string {
     movementPhrases,
     seed,
   )} ${pick(lightingPhrases, seed + 1)}`;
-}
-
-const ideaTemplates: { title: string; type: ShotType; movement: Shot["movement"]; durationSec: number }[] = [
-  { title: "Insert — reaction on a face", type: "close-up", movement: "static", durationSec: 3 },
-  { title: "Cutaway — detail of the environment", type: "macro", movement: "tilt", durationSec: 4 },
-  { title: "Transition — whip pan to the next beat", type: "medium", movement: "pan", durationSec: 2 },
-  { title: "Establishing — reveal the location", type: "wide", movement: "crane", durationSec: 7 },
-];
-
-export function suggestShots(session: Session): Omit<Shot, "id">[] {
-  return ideaTemplates.slice(0, 3).map((tpl) => ({
-    title: tpl.title,
-    description: describeFromTitle(tpl.title, tpl.type),
-    type: tpl.type,
-    movement: tpl.movement,
-    durationSec: tpl.durationSec,
-    location: session.location,
-    lens: tpl.type === "macro" ? "100mm macro" : "50mm",
-    status: "planned",
-  }));
 }
 
 export const factSuggestions = [

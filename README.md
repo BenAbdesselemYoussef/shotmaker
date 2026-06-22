@@ -1,22 +1,31 @@
 # Shotmaker
 
-An **AI-assisted planner for video shoots**. Organize a production into sessions, build each session as a storyboard of shots, and let AI draft shot descriptions and on-set facts — then reorder everything with drag-and-drop.
+A **shoot-day shot tracker for production crews**. Keep tabs on **what to film first**, **what's already filmed or abandoned**, and **which shots actually matter** — so the crew always knows the plan and when the session can wrap.
 
-> **Demo MVP.** Self-contained front-end demo: seeded mock data, local state, no backend or API keys. The AI features are simulated (canned, content-aware) stand-ins for the original Genkit flows. A from-scratch rework of the concept.
+> **Demo MVP.** Self-contained front-end demo: seeded mock data, local state, no backend or API keys. A from-scratch rework of the concept.
 
 ![Storyboard](media/01-storyboard.png)
 
+## The idea
+
+On a shoot, the crew works through an ordered list of shots. Shotmaker tracks the three things that matter on the day:
+
+- **Shooting order** — drag shots to decide what to film first.
+- **Status** — mark each shot **To film → Filmed**, or **Abandoned** if it's dropped. Filmed shots get a check and dim out; abandoned shots are struck through.
+- **Priority** — every shot is **Essential** or **Optional**. The session is **Ready to wrap** once all *essential* shots are filmed — optional shots are a bonus, not a blocker.
+
+A per-session **readiness bar** shows essential progress (e.g. `essential 2/6`) and flips to **Ready to wrap** when the must-haves are done.
+
 ## Features
 
-- **Storyboard** — a grid of cinematic shot frames (numbered, color-graded by shot type), with drag-to-reorder, type/movement chips, durations, and status.
-- **List view** — the same shots as a dense, scannable shot list.
-- **Shot detail panel** — description with one-click **AI generation**, fields (type, movement, duration, lens, location), click-to-advance status, notes, and an **AI fact assistant** that suggests on-set facts to insert.
-- **AI shot ideas** — generates suggested shots to round out a session; add them with one click.
-- **Multiple sessions** — switch between shoots, each with its own color treatment and runtime.
+- **Storyboard & List views** — numbered shots (shooting order), priority + status badges, drag-to-reorder, one-tap status toggle.
+- **Session readiness** — essential vs optional progress, with a clear "ready to wrap" state.
+- **Shot detail panel** — status and priority controls, fields (type, movement, duration, lens, location), notes, plus a light AI assist to draft a shot description and suggest on-set facts (simulated stand-ins for the original Genkit flows).
+- **Multiple sessions** — switch between shoots, each color-treated.
 
-| Shot detail (AI) | AI shot ideas |
+| Shot detail | Ready to wrap |
 | --- | --- |
-| ![Shot panel](media/02-shot-panel.png) | ![AI ideas](media/04-ai-ideas.png) |
+| ![Shot panel](media/02-shot-panel.png) | ![Ready to wrap](media/04-ready-to-wrap.png) |
 
 A short walkthrough is in [`media/video/shotmaker-walkthrough.webm`](media/video/shotmaker-walkthrough.webm).
 

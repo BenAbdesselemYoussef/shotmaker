@@ -20,8 +20,8 @@ async function run() {
   await sleep(700);
   await page.screenshot({ path: `${OUT}/01-storyboard.png` });
 
-  // shot detail panel + fact assistant
-  await page.getByText("Establishing drone over the harbor").click();
+  // shot detail panel (a to-film, essential shot) + fact assistant
+  await page.getByText("Close-up — hands wrap the product").click();
   await page.waitForSelector("text=Generate with AI");
   await page.getByRole("button", { name: "AI fact assistant" }).click();
   await sleep(500);
@@ -33,15 +33,13 @@ async function run() {
   await page.getByRole("button", { name: "List", exact: true }).click();
   await sleep(500);
   await page.screenshot({ path: `${OUT}/03-list.png` });
-
-  // back to storyboard, open AI ideas
   await page.getByRole("button", { name: "Storyboard", exact: true }).click();
   await sleep(300);
-  await page.getByRole("button", { name: "AI shot ideas" }).click();
-  await sleep(1500);
-  await page.screenshot({ path: `${OUT}/04-ai-ideas.png` });
-  await page.keyboard.press("Escape");
-  await sleep(400);
+
+  // a session that is "Ready to wrap" (Makers)
+  await page.getByText("Makers — Documentary").click();
+  await sleep(700);
+  await page.screenshot({ path: `${OUT}/04-ready-to-wrap.png` });
 
   // second session (Nimbus, pink)
   await page.getByText("Nimbus Sneaker — Launch Teaser").click();
@@ -58,10 +56,18 @@ async function run() {
   await vp.waitForSelector("text=Establishing drone over the harbor");
   await sleep(1200);
 
-  // drag a card to reorder
+  // mark a to-film shot as filmed (readiness updates)
   try {
-    const card = vp.getByText("Macro — texture of the material");
-    const target = vp.getByText("Hero walks toward camera");
+    await vp.getByRole("button", { name: "To film" }).first().click();
+    await sleep(1300);
+  } catch (e) {
+    console.log("status click skipped:", e.message);
+  }
+
+  // drag a card to change shooting order
+  try {
+    const card = vp.getByText("Logo — close on the embossed mark");
+    const target = vp.getByText("Close-up — hands wrap the product");
     const a = await card.boundingBox();
     const b = await target.boundingBox();
     if (a && b) {
@@ -78,10 +84,11 @@ async function run() {
   } catch (e) {
     console.log("drag skipped:", e.message);
   }
+  await vp.keyboard.press("Escape"); // close panel if the drag registered as a click
   await sleep(1000);
 
-  // open a shot, generate description with AI
-  await vp.getByText("Close-up — hands wrap the product").click();
+  // open a shot, generate description, fact assistant
+  await vp.getByText("Drone pull-back reveal at blue hour").click();
   await sleep(1200);
   await vp.getByRole("button", { name: "Generate with AI" }).click();
   await sleep(1800);
@@ -90,23 +97,11 @@ async function run() {
   await vp.keyboard.press("Escape");
   await sleep(700);
 
-  // list view
+  // list view, then a session ready to wrap
   await vp.getByRole("button", { name: "List", exact: true }).click();
   await sleep(1500);
   await vp.getByRole("button", { name: "Storyboard", exact: true }).click();
-  await sleep(500);
-
-  // AI shot ideas
-  await vp.getByRole("button", { name: "AI shot ideas" }).click();
-  await sleep(2000);
-  try {
-    await vp.getByRole("button", { name: "Add" }).first().click();
-    await sleep(1000);
-  } catch {}
-  await vp.keyboard.press("Escape");
-  await sleep(800);
-
-  // switch session
+  await sleep(400);
   await vp.getByText("Makers — Documentary").click();
   await sleep(1800);
 
